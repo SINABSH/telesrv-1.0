@@ -1,0 +1,18 @@
+name: Telesrv
+version: 1.0.0
+main: com.telesrv.Telesrv
+api-version: 1.16
+author: YourName
+
+commands:
+  telesrv:
+    description: Main command for Telesrv plugin
+    usage: /<command> [args]
+
+permissions:
+  telesrv.admin:
+    description: Grants admin access to Telesrv plugin
+    default: op
+
+dependencies:
+  - Vault # Add if your plugin depends on Vault or other plugins
