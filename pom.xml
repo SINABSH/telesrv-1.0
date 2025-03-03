@@ -33,14 +33,14 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>${telegram.version}</version>
+            <version>6.9.7</version>
         </dependency>
 
         <!-- JDA (Discord API) -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>${jda.version}</version>
+            <version>5.0.0-beta.18</version>
         </dependency>
 
         <!-- PostgreSQL -->
