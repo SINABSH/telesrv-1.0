@@ -1,35 +1,43 @@
 package com.telesrv.bot;
 
+import com.telesrv.listeners.DiscordListener;
+import com.telesrv.config.ConfigManager;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import javax.security.auth.login.LoginException;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-public class MyDiscordBot extends ListenerAdapter {
-    private final String token;
-    private TextChannel consoleChannel;
+public class MyDiscordBot {
 
-    public MyDiscordBot(String token) {
-        this.token = token;
+    private JDA jda;
+    private final BotManager botManager;
+
+    public MyDiscordBot(BotManager botManager) {
+        this.botManager = botManager;
     }
 
-    public void start() throws LoginException {
-        JDABuilder builder = JDABuilder.createDefault(token);
-        builder.addEventListeners(this);
-        builder.build().awaitReady();
-
-        consoleChannel = builder.build().getTextChannelById("YOUR_CONSOLE_CHANNEL_ID");
-    }
-
-    public void sendMessage(String message) {
-        if (consoleChannel != null) {
-            consoleChannel.sendMessage(message).queue();
+    public JDA buildJDA(String token) {
+        try {
+            jda = JDABuilder.createDefault(token)
+                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
+                .disableCache(CacheFlag.VOICE_STATE, CacheFlag.ACTIVITY)
+                .addEventListeners(new DiscordListener(botManager))
+                .build();
+            jda.awaitReady();
+            System.out.println("Discord bot ready!");
+        } catch (Exception e) {
+            System.err.println("Error starting Discord bot: " + e.getMessage());
         }
+        return jda;
     }
 
-    public void sendToConsoleChannel(String message) {
-        if (consoleChannel != null) {
-            consoleChannel.sendMessage(":desktop: **" + message + "**").queue();
+    public void sendMessageToChannel(String channelId, String message) {
+        jda.getTextChannelById(channelId).sendMessage(message).queue();
+    }
+
+    public void shutdown() {
+        if (jda != null) {
+            jda.shutdown();
         }
     }
 }

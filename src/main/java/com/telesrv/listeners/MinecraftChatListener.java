@@ -1,11 +1,14 @@
 package com.telesrv.listeners;
 
 import com.telesrv.bot.BotManager;
+import com.telesrv.utils.MessageFormatter;
+import com.telesrv.config.ConfigManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class MinecraftChatListener implements Listener {
+
     private final BotManager botManager;
 
     public MinecraftChatListener(BotManager botManager) {
@@ -16,13 +19,16 @@ public class MinecraftChatListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         String playerName = event.getPlayer().getName();
         String message = event.getMessage();
+        String formattedMessage = MessageFormatter.formatFromMinecraft(playerName, message);
 
-        // Format the message to send it to Telegram and Discord
-        String formattedMessage = "[Minecraft] " + playerName + ": " + message;
-
-        // Send the message to the Discord console channel
-        botManager.getDiscordBot().sendToConsoleChannel(formattedMessage);
-        // Send the message to the Telegram chat
-        botManager.getTelegramBot().sendToConsoleChannel(formattedMessage);
+        // Send the chat message to Telegram and Discord
+        botManager.getTelegramBot().sendMessageToTelegram(
+            Long.parseLong(ConfigManager.getProperty("telegram.chat.id")), 
+            formattedMessage
+        );
+        botManager.getDiscordBot().sendMessageToChannel(
+            ConfigManager.getProperty("discord.channel.id"), 
+            formattedMessage
+        );
     }
 }

@@ -1,11 +1,13 @@
 package com.telesrv.listeners;
 
 import com.telesrv.bot.BotManager;
+import com.telesrv.config.ConfigManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerCommandEvent;
 
 public class ConsoleListener implements Listener {
+
     private final BotManager botManager;
 
     public ConsoleListener(BotManager botManager) {
@@ -13,11 +15,17 @@ public class ConsoleListener implements Listener {
     }
 
     @EventHandler
-    public void onConsoleLog(ServerCommandEvent event) {
-        String message = "[Console] " + event.getCommand();
-        // Send Minecraft console command logs to the Discord console channel
-        botManager.getDiscordBot().sendToConsoleChannel(message);
-        // Optionally, send the message to a Telegram channel as well
-        botManager.getTelegramBot().sendToConsoleChannel(message);
+    public void onServerCommand(ServerCommandEvent event) {
+        String command = event.getCommand();
+
+        // Send the console command to Telegram and Discord
+        botManager.getTelegramBot().sendMessageToTelegram(
+            Long.parseLong(ConfigManager.getProperty("telegram.chat.id")), 
+            "Console: " + command
+        );
+        botManager.getDiscordBot().sendMessageToChannel(
+            ConfigManager.getProperty("discord.channel.id"),
+            "Console: " + command
+        );
     }
 }

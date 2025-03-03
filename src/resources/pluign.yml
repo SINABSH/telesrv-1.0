@@ -1,18 +1,14 @@
 name: Telesrv
-version: 1.0.0
 main: com.telesrv.Telesrv
-api-version: 1.16
-author: YourName
-
+version: 1.0
+api-version: 1.21.4
+description: A Minecraft plugin that integrates Telegram and Discord chat with the Minecraft server.
+author: SINABHS
 commands:
   telesrv:
-    description: Main command for Telesrv plugin
-    usage: /<command> [args]
-
+    description: Main command for Telesrv plugin.
+    usage: /<command>
 permissions:
-  telesrv.admin:
-    description: Grants admin access to Telesrv plugin
-    default: op
-
-dependencies:
-  - Vault # Add if your plugin depends on Vault or other plugins
+  telesrv.use:
+    description: Allows the use of Telesrv commands.
+    default: true

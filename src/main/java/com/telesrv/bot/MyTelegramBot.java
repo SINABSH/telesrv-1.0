@@ -1,18 +1,24 @@
 package com.telesrv.bot;
 
+import com.telesrv.config.ConfigManager;
+import com.telesrv.listeners.TelegramListener;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class MyTelegramBot extends TelegramLongPollingBot {
-    private final String token;
-    private final String botUsername;
 
-    public MyTelegramBot(String token) {
-        this.token = token;
-        this.botUsername = "YourBotUsername";  // Set this to your bot's username
+    private final BotManager botManager;
+    private String botToken;
+    private String botUsername;
+
+    public MyTelegramBot(String botToken, BotManager botManager) {
+        this.botToken = botToken;
+        this.botManager = botManager;
+        this.botUsername = ConfigManager.getProperty("telegram.bot.username");
     }
 
     @Override
@@ -22,33 +28,33 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotToken() {
-        return token;
+        return botToken;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Message message = update.getMessage();
-            String messageText = message.getText();
-            // Here you can handle received messages and send them to the Minecraft server
-            System.out.println("Received message from Telegram: " + messageText);
+            String messageText = update.getMessage().getText();
+            new TelegramListener(botManager).handleMessage(update.getMessage());
         }
     }
 
-    public void sendMessage(String chatId, String messageText) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(messageText);
-
+    public void sendMessageToTelegram(Long chatId, String messageText) {
         try {
-            execute(message);  // Send the message to Telegram
+            SendMessage sendMessage = new SendMessage(chatId.toString(), messageText);
+            execute(sendMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            System.err.println("Error sending message to Telegram: " + e.getMessage());
         }
     }
 
-    public void sendToConsoleChannel(String message) {
-        // Replace with actual logic to send logs to Telegram (e.g., a specific group/chat)
-        sendMessage("YOUR_TELEGRAM_CHAT_ID", ":desktop: **" + message + "**");
+    public void startBot() {
+        try {
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBotsApi.registerBot(this);
+            System.out.println("Telegram bot started!");
+        } catch (TelegramApiException e) {
+            System.err.println("Error starting Telegram bot: " + e.getMessage());
+        }
     }
 }

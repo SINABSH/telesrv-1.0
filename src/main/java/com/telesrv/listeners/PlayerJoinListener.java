@@ -1,11 +1,14 @@
 package com.telesrv.listeners;
 
 import com.telesrv.bot.BotManager;
+import com.telesrv.utils.MessageFormatter;
+import com.telesrv.config.ConfigManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class PlayerJoinListener implements Listener {
+
     private final BotManager botManager;
 
     public PlayerJoinListener(BotManager botManager) {
@@ -15,11 +18,16 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         String playerName = event.getPlayer().getName();
-        String message = playerName + " has joined the server.";
+        String formattedMessage = MessageFormatter.formatPlayerJoinMessage(playerName);
 
-        // Send the player join message to the Discord console channel
-        botManager.getDiscordBot().sendToConsoleChannel(message);
-        // Send the player join message to the Telegram chat
-        botManager.getTelegramBot().sendToConsoleChannel(message);
+        // Send the join message to Telegram and Discord
+        botManager.getTelegramBot().sendMessageToTelegram(
+            Long.parseLong(ConfigManager.getProperty("telegram.chat.id")), 
+            formattedMessage
+        );
+        botManager.getDiscordBot().sendMessageToChannel(
+            ConfigManager.getProperty("discord.channel.id"), 
+            formattedMessage
+        );
     }
 }

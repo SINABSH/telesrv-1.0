@@ -1,0 +1,12 @@
+com\telesrv\listeners\MinecraftChatListener.class
+com\telesrv\Telesrv.class
+com\telesrv\bot\BotManager.class
+com\telesrv\listeners\PlayerQuitListener.class
+com\telesrv\listeners\TelegramListener.class
+com\telesrv\bot\MyTelegramBot.class
+com\telesrv\bot\MyDiscordBot.class
+com\telesrv\listeners\DiscordListener.class
+com\telesrv\listeners\ConsoleListener.class
+com\telesrv\listeners\PlayerJoinListener.class
+com\telesrv\config\ConfigManager.class
+com\telesrv\utils\MessageFormatter.class

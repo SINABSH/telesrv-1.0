@@ -1,44 +1,53 @@
 package com.telesrv.bot;
 
-import com.telesrv.Telesrv;
-import net.dv8tion.jda.api.entities.TextChannel;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import com.telesrv.config.ConfigManager;
+import net.dv8tion.jda.api.JDA;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.generics.BotSession;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class BotManager {
-    private final Telesrv plugin;
+
     private MyTelegramBot telegramBot;
     private MyDiscordBot discordBot;
+    private BotSession telegramBotSession;
+    private JDA discordJDA;
 
-    public BotManager(Telesrv plugin) {
-        this.plugin = plugin;
+    public BotManager() {
+        initTelegramBot();
+        initDiscordBot();
     }
 
-    public void startBots() {
-        // Start the Telegram bot
-        String telegramToken = plugin.getConfig().getString("telegram.token");
-        telegramBot = new MyTelegramBot(telegramToken);
+    private void initTelegramBot() {
         try {
-            telegramBot.start();
-        } catch (TelegramApiException e) {
-            plugin.getLogger().severe("Failed to start Telegram bot: " + e.getMessage());
-        }
-
-        // Start the Discord bot
-        String discordToken = plugin.getConfig().getString("discord.token");
-        discordBot = new MyDiscordBot(discordToken);
-        try {
-            discordBot.start();
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+            telegramBot = new MyTelegramBot(ConfigManager.getProperty("telegram.bot.token"), this);
+            telegramBotSession = telegramBotsApi.registerBot(telegramBot);
+            System.out.println("Telegram bot initialized successfully.");
         } catch (Exception e) {
-            plugin.getLogger().severe("Failed to start Discord bot: " + e.getMessage());
+            System.err.println("Failed to initialize Telegram bot: " + e.getMessage());
         }
     }
 
-    public void stopBots() {
-        if (telegramBot != null) {
-            telegramBot.stop();
+    private void initDiscordBot() {
+        try {
+            discordBot = new MyDiscordBot(this);
+            discordJDA = discordBot.buildJDA(ConfigManager.getProperty("discord.bot.token"));
+            discordJDA.awaitReady();
+            System.out.println("Discord bot initialized successfully.");
+        } catch (Exception e) {
+            System.err.println("Failed to initialize Discord bot: " + e.getMessage());
         }
-        if (discordBot != null) {
-            discordBot.stop();
+    }
+
+    public void shutdownBots() {
+        if (telegramBotSession != null) {
+            telegramBotSession.stop();
+            System.out.println("Telegram bot session stopped.");
+        }
+        if (discordJDA != null) {
+            discordJDA.shutdown();
+            System.out.println("Discord JDA stopped.");
         }
     }
 
@@ -48,9 +57,5 @@ public class BotManager {
 
     public MyDiscordBot getDiscordBot() {
         return discordBot;
-    }
-
-    public Telesrv getPlugin() {
-        return plugin;
     }
 }

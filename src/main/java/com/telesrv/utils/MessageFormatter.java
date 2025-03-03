@@ -2,33 +2,23 @@ package com.telesrv.utils;
 
 public class MessageFormatter {
 
-    // Formats Minecraft chat messages for Discord and Telegram
-    public static String formatMinecraftMessage(String playerName, String message) {
-        return "[Minecraft] " + playerName + ": " + message;
+    public static String formatFromTelegram(String username, String message) {
+        return "[Telegram] " + username + ": " + message;
     }
 
-    // Formats Discord chat messages for Minecraft
-    public static String formatDiscordMessage(String userName, String message) {
-        return "[Discord] " + userName + ": " + message;
+    public static String formatFromDiscord(String username, String message) {
+        return "[Discord] " + username + ": " + message;
     }
 
-    // Formats Telegram chat messages for Minecraft
-    public static String formatTelegramMessage(String userName, String message) {
-        return "[Telegram] " + userName + ": " + message;
+    public static String formatFromMinecraft(String username, String message) {
+        return "[Minecraft] " + username + ": " + message;
     }
 
-    // Formats player join messages for Discord and Telegram
-    public static String formatPlayerJoinMessage(String playerName) {
-        return playerName + " has joined the server.";
+    public static String formatPlayerJoinMessage(String username) {
+        return "[Server] " + username + " has joined the game.";
     }
 
-    // Formats player quit messages for Discord and Telegram
-    public static String formatPlayerQuitMessage(String playerName) {
-        return playerName + " has left the server.";
-    }
-
-    // Formats console log messages for Discord and Telegram
-    public static String formatConsoleMessage(String message) {
-        return ":desktop: **" + message + "**";
+    public static String formatPlayerQuitMessage(String username) {
+        return "[Server] " + username + " has left the game.";
     }
 }
